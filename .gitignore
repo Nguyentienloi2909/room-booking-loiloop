@@ -1,0 +1,15 @@
+# Node.js
+node_modules/
+.cache/
+*.log
+
+# IDE
+.vscode/
+
+# Build artifacts
+build/
+dist/
+*.zip
+
+# Docker
+*.env

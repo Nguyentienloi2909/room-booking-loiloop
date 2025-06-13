@@ -1,0 +1,59 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    environment:
+      MYSQL_DATABASE: roomBookingDb
+      MYSQL_ROOT_PASSWORD: loi123456
+    ports:
+      - '3316:3306'
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - springboot-mysql
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: booking-hotel
+    ports:
+      - '4040:4040'
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/roomBookingDb?createDatabaseIfNotExist=true
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: loi123456
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.MySQLDialect
+      SPRING_JPA_PROPERTIES_HIBERNATE_SHOW_SQL: true
+      SPRING_JPA_PROPERTIES_HIBERNATE_FORMAT_SQL: true
+      AWS_S3_ACCESS_KEY: 4bb6d1dfbafb64a681139d1586b6f1160d18159afd57c8c79136d7490630407c
+      AWS_S3_SECRET_KEY: 4bb6d1dfbafb64a681139d1586b6f1160d18159afd57c8c79136d7490630407c
+    depends_on:
+      - mysql
+    volumes:
+      - app-data:/app/uploads
+    networks:
+      - springboot-mysql
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: room-booking-frontend
+    ports:
+      - '3000:80'
+    depends_on:
+      - backend
+    networks:
+      - springboot-mysql
+
+volumes:
+  mysql-data:
+  app-data:
+
+networks:
+  springboot-mysql:
+    driver: bridge
